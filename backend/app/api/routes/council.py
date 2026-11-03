@@ -22,7 +22,7 @@ from app.core.provider_factory import get_provider_for_agent as central_get_prov
 from app.core.resilience import RecoveryPolicy
 from app.database.db import get_db
 from app.database.models import CouncilSession, AgentMessage, ExecutionEvent, User
-from app.security.authorization import get_current_user_optional
+from app.security.authorization import get_session_user
 from app.core.schemas import (
     CouncilSessionDetailResponse,
     ResilienceConfigSchema,
@@ -94,7 +94,7 @@ async def update_resilience_config(update: ResilienceConfigUpdateSchema):
 async def start_council_session(
     req: StartSessionRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """
     Starts a new Council session using the fault-tolerant LangGraph workflow.
@@ -233,7 +233,7 @@ async def start_council_session(
 async def stream_council_execution(
     req: StartSessionRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """
     Direct SSE streaming endpoint: executes the Council workflow and streams events

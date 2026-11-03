@@ -6,7 +6,7 @@ Each agent maintains isolated conversation threads, context history, and distinc
 """
 
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -17,7 +17,7 @@ from app.core.provider_factory import get_provider_for_agent
 from app.core.response_validator import execute_with_controlled_continuation
 from app.database.db import get_db
 from app.database.models import AgentConfig, Conversation, ConversationMessage, User
-from app.security.authorization import get_current_user_optional
+from app.security.authorization import get_session_user
 
 router = APIRouter(prefix="/chat", tags=["Agent Chat"])
 
@@ -70,7 +70,7 @@ class SendMessageRequest(BaseModel):
 def list_conversations(
     agent_id: Optional[str] = None,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """List conversations scoped to authenticated user or default desktop user."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"
@@ -96,7 +96,7 @@ def list_conversations(
 def create_conversation(
     req: CreateConversationRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """Create a new isolated conversation thread scoped to authenticated user."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"
@@ -128,7 +128,7 @@ def create_conversation(
 def get_conversation_detail(
     conversation_id: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """Retrieve an agent's conversation thread with ownership IDOR protection."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"
@@ -165,7 +165,7 @@ def rename_conversation(
     conversation_id: str,
     req: RenameConversationRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """Rename a conversation thread with ownership IDOR verification."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"
@@ -195,7 +195,7 @@ def rename_conversation(
 def delete_conversation(
     conversation_id: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """Delete a conversation thread with ownership IDOR protection."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"
@@ -216,7 +216,7 @@ async def send_agent_message(
     conversation_id: str,
     req: SendMessageRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """
     Send a message to an individual agent in this conversation thread.

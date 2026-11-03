@@ -385,3 +385,128 @@ def test_cross_user_document_and_history_isolation():
     assert hist_res.status_code == 200
     assert all(s["id"] != session_id for s in hist_res.json())
 
+
+# ─── 13. Online vs Local Mode Security Boundary & Multi-Tenant Tests ───────────
+
+def test_online_mode_requires_authentication_returns_401(monkeypatch):
+    """Verify that unauthenticated requests return HTTP 401 when running in online deployment mode."""
+    monkeypatch.setattr(settings, "deployment_mode", "online")
+
+    # Protected chat endpoint
+    res_chat = client.get("/api/v1/chat/conversations")
+    assert res_chat.status_code == 401
+    assert "Authentication required" in res_chat.json()["detail"]
+
+    # Protected documents endpoint
+    res_docs = client.get("/api/v1/documents")
+    assert res_docs.status_code == 401
+
+    # Protected history endpoint
+    res_hist = client.get("/api/v1/history/sessions")
+    assert res_hist.status_code == 401
+
+
+def test_invalid_and_expired_tokens_return_401():
+    """Verify that malformed or expired JWT tokens are strictly rejected with HTTP 401."""
+    # Malformed token
+    bad_headers = {"Authorization": "Bearer not.a.valid.jwt.token"}
+    res = client.get("/api/v1/chat/conversations", headers=bad_headers)
+    assert res.status_code == 401
+    assert "Invalid or expired" in res.json()["detail"]
+
+    # Expired token
+    from datetime import timedelta
+    from app.security.authentication import create_access_token
+    expired_token = create_access_token("some_user", expires_delta=timedelta(seconds=-60))
+    res_expired = client.get("/api/v1/chat/conversations", headers={"Authorization": f"Bearer {expired_token}"})
+    assert res_expired.status_code == 401
+
+
+def test_local_desktop_mode_works_without_login(monkeypatch):
+    """Verify that in local desktop mode, endpoints resolve to local user without login."""
+    monkeypatch.setattr(settings, "deployment_mode", "local")
+
+    res = client.get("/api/v1/chat/conversations")
+    assert res.status_code == 200
+
+    res_docs = client.get("/api/v1/documents")
+    assert res_docs.status_code == 200
+
+
+def test_user_identity_cannot_be_overridden_via_request_parameters():
+    """Verify that supplying an arbitrary user_id in the request payload does NOT override token identity."""
+    from app.database.db import SessionLocal
+    from app.database.models import User, Conversation
+    from app.security.authentication import create_access_token, hash_password
+    import uuid
+
+    db = SessionLocal()
+    user_real_id = str(uuid.uuid4())
+    user_spoofed_id = str(uuid.uuid4())
+
+    user_real = User(
+        id=user_real_id,
+        username=f"real_{user_real_id[:6]}",
+        email=f"real_{user_real_id[:6]}@example.com",
+        hashed_password=hash_password("password123"),
+        is_active=True,
+    )
+    db.add(user_real)
+    db.commit()
+
+    token = create_access_token(user_real_id)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Attempt to spoof identity by passing user_id in body
+    res = client.post(
+        "/api/v1/chat/conversations",
+        json={"agent_id": "researcher", "title": "Spoof Attempt", "user_id": user_spoofed_id},
+        headers=headers,
+    )
+    assert res.status_code == 200
+    conv_id = res.json()["id"]
+
+    # Verify in DB that conversation is strictly bound to user_real_id
+    conv = db.query(Conversation).filter(Conversation.id == conv_id).first()
+    assert conv.user_id == user_real_id
+    assert conv.user_id != user_spoofed_id
+
+
+def test_concurrent_users_do_not_share_data():
+    """Verify that concurrent distinct user contexts maintain strictly isolated data silos."""
+    from app.database.db import SessionLocal
+    from app.database.models import User
+    from app.security.authentication import create_access_token, hash_password
+    import uuid
+
+    db = SessionLocal()
+    u1_id = str(uuid.uuid4())
+    u2_id = str(uuid.uuid4())
+
+    u1 = User(id=u1_id, username=f"u1_{u1_id[:6]}", email=f"u1_{u1_id[:6]}@test.com", hashed_password=hash_password("pw"), is_active=True)
+    u2 = User(id=u2_id, username=f"u2_{u2_id[:6]}", email=f"u2_{u2_id[:6]}@test.com", hashed_password=hash_password("pw"), is_active=True)
+    db.add(u1)
+    db.add(u2)
+    db.commit()
+
+    t1 = create_access_token(u1_id)
+    t2 = create_access_token(u2_id)
+
+    # U1 creates 2 conversations
+    c1_1 = client.post("/api/v1/chat/conversations", json={"agent_id": "analyst", "title": "U1 C1"}, headers={"Authorization": f"Bearer {t1}"}).json()["id"]
+    c1_2 = client.post("/api/v1/chat/conversations", json={"agent_id": "critic", "title": "U1 C2"}, headers={"Authorization": f"Bearer {t1}"}).json()["id"]
+
+    # U2 creates 1 conversation
+    c2_1 = client.post("/api/v1/chat/conversations", json={"agent_id": "specialist", "title": "U2 C1"}, headers={"Authorization": f"Bearer {t2}"}).json()["id"]
+
+    # U1 lists conversations -> exactly 2
+    u1_list = client.get("/api/v1/chat/conversations", headers={"Authorization": f"Bearer {t1}"}).json()
+    assert len(u1_list) == 2
+    assert {c["id"] for c in u1_list} == {c1_1, c1_2}
+
+    # U2 lists conversations -> exactly 1
+    u2_list = client.get("/api/v1/chat/conversations", headers={"Authorization": f"Bearer {t2}"}).json()
+    assert len(u2_list) == 1
+    assert u2_list[0]["id"] == c2_1
+
+

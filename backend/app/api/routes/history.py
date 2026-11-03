@@ -4,7 +4,7 @@ backend/app/api/routes/history.py
 Session history endpoints.
 """
 
-from typing import List, Optional
+from typing import Any, List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.database.db import get_db
 from app.database.models import CouncilSession, User
-from app.security.authorization import get_current_user_optional
+from app.security.authorization import get_session_user
 
 router = APIRouter(prefix="/history", tags=["History"])
 
@@ -55,7 +55,7 @@ class SessionDetail(BaseModel):
 def get_session_history(
     limit: int = 20,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """Retrieve historical council sessions scoped to user or desktop installation."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"
@@ -85,7 +85,7 @@ def get_session_history(
 def get_session_detail(
     session_id: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """Retrieve detailed information for a specific council session with IDOR protection."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"

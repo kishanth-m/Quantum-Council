@@ -32,6 +32,14 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     debug: bool = False
     environment: str = "development"
+    # "local"  = Desktop mode: single-user zero-login experience with local "default_user" identity.
+    # "online" = Cloud/multi-tenant mode: strict authentication enforced on all protected endpoints.
+    #            Unauthenticated requests return HTTP 401 Unauthorized.
+    deployment_mode: str = "local"
+
+    @property
+    def is_online_mode(self) -> bool:
+        return self.deployment_mode.lower() == "online"
 
     # ─── Server ────────────────────────────────────────────────────────────────
     host: str = "127.0.0.1"

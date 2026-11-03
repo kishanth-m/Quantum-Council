@@ -24,7 +24,7 @@ from app.config import settings
 from app.core.paths import get_uploads_dir
 from app.database.db import SessionLocal, get_db
 from app.database.models import Document, DocumentChunk, DocumentCollection, User
-from app.security.authorization import get_current_user_optional
+from app.security.authorization import get_session_user
 
 router = APIRouter(prefix="/documents", tags=["Documents & RAG"])
 
@@ -260,7 +260,7 @@ class TestRetrievalRequest(BaseModel):
 @router.get("", response_model=List[DocumentResponse])
 def list_documents(
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """List indexed documents scoped to the authenticated user or local desktop user."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"
@@ -289,7 +289,7 @@ def list_documents(
 async def upload_document(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """
     Upload and index a document (PDF or text).
@@ -503,7 +503,7 @@ def test_retrieval(req: TestRetrievalRequest, db: Session = Depends(get_db)):
 def get_document_chunks(
     document_id: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """Inspect all extracted chunks and page references for a document with ownership check."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"
@@ -532,7 +532,7 @@ def get_document_chunks(
 def delete_document(
     document_id: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: Any = Depends(get_session_user),
 ):
     """Delete an individual document and its chunks with ownership IDOR verification."""
     user_id = current_user.id if hasattr(current_user, "id") else "default_user"
