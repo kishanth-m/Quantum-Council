@@ -1,76 +1,155 @@
-# Quantum Council
+# 🏛️ Quantum Council
 
-**Multi-Agent Collaborative Intelligence**
+### *Five Minds. One Intelligence — Multi-Agent Collaborative Deliberation*
+
+[![Python](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
+[![LangGraph](https://img.shields.io/badge/LangGraph-0.2-FF6F00?logo=langchain&logoColor=white)](https://langchain-ai.github.io/langgraph/)
+[![Ollama](https://img.shields.io/badge/Ollama-Offline%20First-black?logo=ollama&logoColor=white)](https://ollama.ai)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/Tests-71%20Passed-brightgreen)](backend/tests/)
 
 ---
 
-## 1. Project Introduction
-
-Quantum Council is a local-first multi-agent AI deliberation system designed to break complex engineering, scientific, and architectural questions out of single-model bias. By coordinating five specialized autonomous agents through an orchestrated deliberation graph, the platform conducts multi-perspective analysis, cross-examination, critique, and synthesis before delivering a single grounded consensus answer.
-
-Built with a FastAPI backend, a LangGraph state machine, an Ollama local inference engine, and a React 18 TypeScript frontend, Quantum Council operates entirely on local hardware with zero required cloud dependencies.
+<p align="center">
+  <img src="docs/images/dashboard_overview.jpg" alt="Quantum Council Command Centre" width="100%" />
+  <br />
+  <em><b>Quantum Council Command Centre</b> — Real-time telemetry, active local model engine, and cognitive agent profiles in dark glassmorphism.</em>
+</p>
 
 ---
 
-## 2. Problem Statement
+## 📑 Table of Contents
+
+- [1. Project Introduction](#1-project-introduction)
+- [2. Problem Statement](#2-problem-statement)
+- [3. Key Features](#3-key-features)
+- [4. Visual Interface & Demonstration](#4-visual-interface--demonstration)
+- [5. Five Specialized Agent Roles](#5-five-specialized-agent-roles)
+- [6. Deliberation & Interaction Modes](#6-deliberation--interaction-modes)
+- [7. Architecture Overview (Diagram A)](#7-architecture-overview)
+- [8. Full Council Deliberation Workflow (Diagram B)](#8-full-council-deliberation-workflow)
+- [9. Knowledge Vault and RAG Workflow (Diagram C)](#9-knowledge-vault-and-rag-workflow)
+- [10. Technology Stack](#10-technology-stack)
+- [11. Requirements and Prerequisites](#11-requirements-and-prerequisites)
+- [12. Installation from Fresh Git Clone](#12-installation-from-fresh-git-clone)
+- [13. Environment Configuration](#13-environment-configuration)
+- [14. Local Model Configuration (Ollama)](#14-local-model-configuration-ollama)
+- [15. Online Model Configuration (Opt-In Hybrid Mode)](#15-online-model-configuration-opt-in-hybrid-mode)
+- [16. Startup Instructions](#16-startup-instructions)
+- [17. Testing Instructions (71 Tests)](#17-testing-instructions)
+- [18. Privacy and Security Architecture (Diagram D)](#18-privacy-and-security-architecture)
+- [19. Common Troubleshooting](#19-common-troubleshooting)
+- [20. Known Limitations](#20-known-limitations)
+- [21. Contributing](#21-contributing)
+- [22. License](#22-license)
+- [23. Author](#23-author)
+
+---
+
+## 📖 1. Project Introduction
+
+**Quantum Council** is a local-first multi-agent AI deliberation system designed to break complex engineering, scientific, and architectural questions out of single-model bias. By coordinating five specialized autonomous agents through an orchestrated deliberation graph, the platform conducts multi-perspective analysis, cross-examination, critique, and synthesis before delivering a single grounded consensus answer.
+
+Built with a **FastAPI** backend, a **LangGraph** state machine, an **Ollama** local inference engine, and a **React 18 TypeScript** frontend, Quantum Council operates entirely on local hardware with zero required cloud dependencies.
+
+---
+
+## 🔍 2. Problem Statement
 
 Single-prompt Large Language Model interactions suffer from systematic failure modes:
 
-- **Perspective Blind Spots**: A single model turn optimizes for plausibility rather than critical scrutiny, frequently missing secondary trade-offs.
-- **Unchallenged Assumptions**: Without dialectical debate, models fail to cross-examine their own premises.
-- **Privacy Leakage**: Commercial AI collaboration platforms routinely send sensitive engineering schemas, internal documents, and corporate transcripts to third-party cloud infrastructure.
-- **Disconnected Retrieval**: Conventional RAG implementations often dump large text chunks into a generic prompt without rigorous page-level attribution or specialized analytical roles.
+- ❌ **Perspective Blind Spots**: A single model turn optimizes for plausibility rather than critical scrutiny, frequently missing secondary trade-offs.
+- ❌ **Unchallenged Assumptions**: Without dialectical debate, models fail to cross-examine their own premises.
+- ❌ **Privacy Leakage**: Commercial AI collaboration platforms routinely send sensitive engineering schemas, internal documents, and corporate transcripts to third-party cloud infrastructure.
+- ❌ **Disconnected Retrieval**: Conventional RAG implementations often dump large text chunks into a generic prompt without rigorous page-level attribution or specialized analytical roles.
 
 Quantum Council solves this by decomposing tasks across distinct cognitive personas, enforcing structured cross-agent critique, isolating data locally, and grounding deliberations in an indexed Knowledge Vault with verified page-by-page citations.
 
 ---
 
-## 3. Key Features
+## ✨ 3. Key Features
 
-- **Five Autonomous Cognitive Roles**: Discrete persona prompts specifically tuned for empirical research, algorithmic feasibility, lateral alternatives, dialectical critique, and production implementation.
-- **Fault-Tolerant LangGraph Orchestration**: Dynamic state machine with per-agent circuit breakers, automated retry policies, and role substitution if a local model fails.
-- **Strict Local-First Privacy Boundary**: Operates offline via Ollama. Conversations, SQLite databases, and document indexes reside exclusively in the operating system's local user profile directory.
-- **Verifiable Knowledge Vault (Hybrid RAG)**: Pure-Python page-by-page document extraction (PDF, Markdown, TXT), cohesive text chunking, and hybrid scoring combining TF-IDF cosine similarity, keyword overlap, and phrase boosting.
-- **Three Deliberation Modes**: Tailored execution workflows ranging from low-latency 1-on-1 dialogue to the comprehensive 5-agent deliberation chamber.
-- **Multi-Tenant User Isolation & IDOR Protection**: Scoped database records preventing cross-user conversation, document, or session leakage in multi-user deployments.
-- **Real-Time Token Streaming**: Server-Sent Events (SSE) stream incremental agent deliberations and status telemetry to the presentation layer without blocking the UI thread.
-- **Hardware-Backed Credential Security**: Cloud API tokens (for opt-in hybrid mode) are protected via Windows DPAPI hardware keyrings or Fernet encryption before persisting to disk.
+- 🧠 **Five Autonomous Cognitive Roles**: Discrete persona prompts specifically tuned for empirical research, algorithmic feasibility, lateral alternatives, dialectical critique, and production implementation.
+- ⚡ **Fault-Tolerant LangGraph Orchestration**: Dynamic state machine with per-agent circuit breakers, automated retry policies, and role substitution if a local model fails.
+- 🔒 **Strict Local-First Privacy Boundary**: Operates offline via Ollama. Conversations, SQLite databases, and document indexes reside exclusively in the operating system's local user profile directory (`%LOCALAPPDATA%\QuantumCouncil`).
+- 📚 **Verifiable Knowledge Vault (Hybrid RAG)**: Pure-Python page-by-page document extraction (PDF, Markdown, TXT), cohesive text chunking, and hybrid scoring combining TF-IDF cosine similarity, keyword overlap, and phrase boosting.
+- 🎯 **Three Deliberation Modes**: Tailored execution workflows ranging from low-latency 1-on-1 dialogue to the comprehensive 5-agent deliberation chamber.
+- 🛡️ **Multi-Tenant User Isolation & IDOR Protection**: Scoped database records preventing cross-user conversation, document, or session leakage in multi-user deployments.
+- 🌊 **Real-Time Token Streaming**: Server-Sent Events (SSE) stream incremental agent deliberations and status telemetry to the presentation layer without blocking the UI thread.
+- 🔐 **Hardware-Backed Credential Security**: Cloud API tokens (for opt-in hybrid mode) are protected via Windows DPAPI hardware keyrings or Fernet encryption before persisting to disk.
 
 ---
 
-## 4. Five Agent Roles
+## 🖼️ 4. Visual Interface & Demonstration
+
+Experience the intuitive glassmorphic interface engineered for real-time multi-agent visibility:
+
+### 🏛️ Virtual Council Room — Collaborative Chamber
+The centerpiece deliberation arena where five specialized agent intelligences assemble on the Dais, debate hypotheses across structured rounds, and present their verified consensus.
+
+<p align="center">
+  <img src="docs/images/council_room.jpg" alt="Virtual Council Room" width="100%" />
+</p>
+
+### 💬 Individual Agent Chat — Targeted 1-on-1 Dialogue
+Engage directly with a specific specialist mind (Researcher, Analyst, Alternative Thinker, Critic, or Specialist) for low-latency queries, isolated algorithmic analysis, or rapid prototyping.
+
+<p align="center">
+  <img src="docs/images/agent_chat.jpg" alt="Agent Chat - 1-on-1 Dialogue" width="100%" />
+</p>
+
+### 📚 Knowledge Vault — Grounded Document Intelligence & Diagnostic RAG
+Upload PDFs, research papers, or markdown notes. Inspect exact indexed passages, page numbers, and similarity rankings before injecting grounded evidence into Council deliberations.
+
+<p align="center">
+  <img src="docs/images/knowledge_vault.jpg" alt="Knowledge Vault and Diagnostic RAG Lab" width="100%" />
+</p>
+
+### 🛡️ Privacy Centre — Local Sovereignty & Execution Boundaries
+Toggle between Strict Local-Only Mode (air-gapped, zero network telemetry, Ollama on-device execution) and Hybrid Mode (opt-in cloud frontier LLMs for high-throughput synthesis).
+
+<p align="center">
+  <img src="docs/images/privacy_centre.jpg" alt="Privacy Centre and Data Sovereignty" width="100%" />
+</p>
+
+---
+
+## 🧠 5. Five Specialized Agent Roles
 
 Each agent operates under a tailored system prompt and focused cognitive objective:
 
-| Agent | Identity & Role | Core Focus & Output Specification |
-| :--- | :--- | :--- |
-| **Researcher** | Empirical Baseline & Evidence | Retrieves verified factual baselines, benchmarks, and document citations from the Knowledge Vault. Outputs empirical facts within 60–120 words. |
-| **Analyst** | Feasibility & Algorithmic Trade-offs | Evaluates computational complexity, scalability, bottlenecks, and quantitative constraints within 60–120 words. |
-| **Alternative Thinker** | Lateral & Unorthodox Approaches | Challenges conventional engineering patterns by proposing contrarian, out-of-the-box, or lateral methodologies within 60–120 words. |
-| **Critic** | Dialectical Review & Cross-Examination | Identifies single points of failure, unstated assumptions, and flaws across peers. Challenges one specific agent to Round 2 debate. |
-| **Specialist** | Concrete Implementation Architecture | Formulates exact implementation specifications, architectural code structures, and concrete deployment requirements within 60–120 words. |
+| Agent | Icon | Identity & Role | Core Focus & Output Specification |
+| :--- | :---: | :--- | :--- |
+| **Researcher** | 🔍 | Empirical Baseline & Evidence | Retrieves verified factual baselines, benchmarks, and document citations from the Knowledge Vault. Outputs empirical facts within 60–120 words. |
+| **Analyst** | 📊 | Feasibility & Algorithmic Trade-offs | Evaluates computational complexity, scalability, bottlenecks, and quantitative constraints within 60–120 words. |
+| **Alternative Thinker** | 💡 | Lateral & Unorthodox Approaches | Challenges conventional engineering patterns by proposing contrarian, out-of-the-box, or lateral methodologies within 60–120 words. |
+| **Critic** | ⚖️ | Dialectical Review & Cross-Examination | Identifies single points of failure, unstated assumptions, and flaws across peers. Challenges one specific agent to Round 2 debate. |
+| **Specialist** | ⚙️ | Concrete Implementation Architecture | Formulates exact implementation specifications, architectural code structures, and concrete deployment requirements within 60–120 words. |
 
 ---
 
-## 5. Interaction Modes
+## 💬 6. Deliberation & Interaction Modes
 
-### Mode 1 — Individual Agent
+### 🎯 Mode 1 — Individual Agent
 Direct 1-on-1 dialogue with a single specialized mind. Designed for focused, rapid iteration (e.g., querying the Specialist for a specific algorithm or the Researcher for document verification). Sub-4s local response time.
 
-### Mode 2 — Parallel Collaboration
+### 🌐 Mode 2 — Parallel Collaboration
 Broadcasts the user prompt simultaneously to all five agents without cross-talk. Each agent produces an independent perspective in parallel, allowing users to compare diverse domain viewpoints side by side.
 
-### Mode 3 — Full Council
+### 🏛️ Mode 3 — Full Council
 The core orchestrated deliberation chamber. Executes a structured multi-round protocol:
-1. Orchestrator ingests task and retrieves grounded evidence from the Knowledge Vault.
-2. Phase 1: Researcher, Analyst, and Alternative Thinker generate empirical, feasibility, and lateral perspectives.
-3. Phase 2: Specialist formulates concrete implementation while the Critic cross-examines submissions and challenges one agent.
-4. Phase 3: The challenged agent provides a structured Round 2 rebuttal.
-5. Phase 4: Orchestrator synthesizes a mandatory 4-part consensus answer.
+1. 📥 **Ingestion**: Orchestrator ingests task and retrieves grounded evidence from the Knowledge Vault.
+2. 🔍 **Phase 1 (Parallel Domain Analysis)**: Researcher, Analyst, and Alternative Thinker generate empirical, feasibility, and lateral perspectives.
+3. ⚖️ **Phase 2 (Technical Review & Critique)**: Specialist formulates concrete implementation while the Critic cross-examines submissions and challenges one agent.
+4. 🔄 **Phase 3 (Dialectical Debate & Rebuttal)**: The challenged agent provides a structured Round 2 rebuttal.
+5. 📝 **Phase 4 (Consensus Synthesis)**: Orchestrator synthesizes a mandatory 4-part consensus answer.
 
 ---
 
-## 6. Architecture Overview
+## 🏗️ 7. Architecture Overview
 
 ### Diagram A — Overall System Architecture
 
@@ -132,7 +211,7 @@ flowchart TD
 
 ---
 
-## 7. Full Council Execution Workflow
+## 🔄 8. Full Council Deliberation Workflow
 
 ### Diagram B — Full Council Deliberation Workflow
 
@@ -176,7 +255,7 @@ sequenceDiagram
 
 ---
 
-## 8. Knowledge Vault and RAG Workflow
+## 📚 9. Knowledge Vault and RAG Workflow
 
 ### Diagram C — Knowledge Vault RAG Workflow
 
@@ -204,9 +283,9 @@ flowchart TD
 
 ---
 
-## 9. Technology Stack
+## 🛠️ 10. Technology Stack
 
-### Backend Infrastructure
+### 🐍 Backend Infrastructure
 - **Runtime**: Python 3.12+
 - **API Framework**: FastAPI 0.115 / Starlette (Async ASGI engine)
 - **Multi-Agent Orchestration**: LangGraph 0.2 / LangChain Core
@@ -215,7 +294,7 @@ flowchart TD
 - **Document Processing**: `pypdf` page-level extraction + pure-Python normalized TF-IDF vectorizer
 - **Security & Cryptography**: Windows DPAPI (`wincrypto`), `cryptography` (Fernet), `python-jose` (JWT), `bcrypt`
 
-### Frontend Application
+### ⚛️ Frontend Application
 - **Framework**: React 18 / TypeScript
 - **Tooling & Bundler**: Vite 6
 - **Styling**: Tailwind CSS + Custom Liquid Glass Optical CSS Engine
@@ -225,23 +304,23 @@ flowchart TD
 
 ---
 
-## 10. Requirements and Prerequisites
+## 📋 11. Requirements and Prerequisites
 
 Before installation, verify the following prerequisites:
 
-1. **Operating System**: Windows 10/11 (fully supported with DPAPI credential security), Linux, or macOS.
-2. **Python**: Version `3.12.x` (or `>= 3.11`).
-3. **Node.js**: Version `18.x` or `>= 20.x` (`npm` included).
-4. **Ollama**: Download and install from [ollama.ai](https://ollama.ai).
-5. **Git**: Installed and configured on your command line.
+1. 💻 **Operating System**: Windows 10/11 (fully supported with DPAPI credential security), Linux, or macOS.
+2. 🐍 **Python**: Version `3.12.x` (or `>= 3.11`).
+3. 📦 **Node.js**: Version `18.x` or `>= 20.x` (`npm` included).
+4. 🦙 **Ollama**: Download and install from [ollama.ai](https://ollama.ai).
+5. 🐙 **Git**: Installed and configured on your command line.
 
 ---
 
-## 11. Installation from Fresh Git Clone
+## 💻 12. Installation from Fresh Git Clone
 
 Follow these steps to clone, configure, and install Quantum Council.
 
-### Windows (PowerShell)
+### 🪟 Windows (PowerShell)
 
 ```powershell
 # 1. Clone the repository
@@ -265,7 +344,7 @@ npm install
 cd ..
 ```
 
-### Linux / macOS (Bash)
+### 🐧 Linux / macOS (Bash)
 
 ```bash
 # 1. Clone the repository
@@ -291,7 +370,7 @@ cd ..
 
 ---
 
-## 12. Environment Configuration
+## ⚙️ 13. Environment Configuration
 
 The repository provides a secure template at `.env.example`. Create your local `.env` file and review key options:
 
@@ -331,7 +410,7 @@ MAX_UPLOAD_SIZE_MB=50
 
 ---
 
-## 13. Local Model Configuration (Ollama)
+## 🦙 14. Local Model Configuration (Ollama)
 
 Quantum Council requires an Ollama daemon running on your machine:
 
@@ -351,7 +430,7 @@ Once pulled, models appear automatically in the **Model Centre** page of the Qua
 
 ---
 
-## 14. Online Model Configuration (Opt-In Hybrid Mode)
+## 🌐 15. Online Model Configuration (Opt-In Hybrid Mode)
 
 If you explicitly choose to use external cloud providers (e.g., Groq, OpenAI-compatible APIs):
 
@@ -362,9 +441,9 @@ If you explicitly choose to use external cloud providers (e.g., Groq, OpenAI-com
 
 ---
 
-## 15. Startup Instructions
+## 🚀 16. Startup Instructions
 
-### Automated Startup (Windows Quickstart)
+### ⚡ Automated Startup (Windows Quickstart)
 
 A consolidated PowerShell script verifies prerequisites and starts both services:
 
@@ -372,7 +451,7 @@ A consolidated PowerShell script verifies prerequisites and starts both services
 powershell -ExecutionPolicy Bypass -File scripts/run.ps1
 ```
 
-### Manual Startup (Two Terminals)
+### 🛠️ Manual Startup (Two Terminals)
 
 #### Terminal 1 — Backend API
 ```powershell
@@ -392,16 +471,16 @@ npm run dev
 ```
 
 Open your browser at:
-- **Frontend Dashboard**: [http://localhost:5173](http://localhost:5173)
-- **Backend API Documentation**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) (available when `DEBUG=true`)
+- 🌐 **Frontend Dashboard**: [http://localhost:5173](http://localhost:5173)
+- 📑 **Backend API Documentation**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) (available when `DEBUG=true`)
 
 ---
 
-## 16. Testing Instructions
+## 🧪 17. Testing Instructions
 
 Quantum Council enforces automated testing across both backend and frontend layers:
 
-### Backend Pytest Suite (66 Tests)
+### 🐍 Backend Pytest Suite (71 Tests)
 
 Run the full unit and integration test suite:
 
@@ -410,15 +489,15 @@ Run the full unit and integration test suite:
 ```
 
 Test coverage includes:
-- Multi-agent state transitions and recovery workflows (`test_recovery_workflow.py`).
-- Knowledge Vault PDF extraction and hybrid vector retrieval (`test_rag_pipeline.py`).
-- Agent circuit breaker thresholds and failure recovery (`test_resilience.py`).
-- Cross-user conversation, document, and session isolation (`test_security_hardening.py`).
-- Insecure direct object reference (IDOR) rejection (`test_security_hardening.py`).
-- Host header anti-DNS rebinding and CSRF origin verification (`test_security_hardening.py`).
-- Path traversal rejection on document upload (`test_security_hardening.py`).
+- ✅ Multi-agent state transitions and recovery workflows (`test_recovery_workflow.py`).
+- ✅ Knowledge Vault PDF extraction and hybrid vector retrieval (`test_rag_pipeline.py`).
+- ✅ Agent circuit breaker thresholds and failure recovery (`test_resilience.py`).
+- ✅ Cross-user conversation, document, and session isolation (`test_security_hardening.py`).
+- ✅ Insecure direct object reference (IDOR) rejection (`test_security_hardening.py`).
+- ✅ Host header anti-DNS rebinding and CSRF origin verification (`test_security_hardening.py`).
+- ✅ Path traversal rejection on document upload (`test_security_hardening.py`).
 
-### Frontend Production Build
+### ⚛️ Frontend Production Build
 
 Validate TypeScript types and build the production bundle:
 
@@ -428,7 +507,7 @@ npm --prefix frontend run build
 
 ---
 
-## 17. Privacy and Security Architecture
+## 🛡️ 18. Privacy and Security Architecture
 
 ### Diagram D — Online vs Local Deployment Architecture
 
@@ -458,18 +537,18 @@ flowchart LR
     SharedCore --- OnlineArch
 ```
 
-### Security Defenses Implemented
+### 🔒 Security Defenses Implemented
 
-1. **Host Header Validation**: `LocalSecurityMiddleware` rejects non-loopback HTTP Host headers to protect against DNS rebinding attacks.
-2. **Cross-Origin CSRF Protection**: Validates the `Origin` header on state-changing HTTP methods (`POST`, `PUT`, `DELETE`, `PATCH`). Requests from untrusted origins are rejected with `403 Forbidden`.
-3. **Hardware-Backed Credential Security**: Cloud API tokens are encrypted via Windows DPAPI before storage. Keys are masked in all API responses.
-4. **Data Isolation & IDOR Protection**: Endpoints enforce user ownership checks. Users cannot view, modify, or delete another user's conversations, uploaded documents, or session history.
-5. **Path Traversal Guards**: Uploaded filenames are sanitized (`os.path.basename` + regex character whitelist), preventing directory escape attempts (`../../evil.pdf`).
-6. **Defensive HTTP Headers**: Enforces `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and restrictive `Permissions-Policy`.
+1. 🛡️ **Host Header Validation**: `LocalSecurityMiddleware` rejects non-loopback HTTP Host headers to protect against DNS rebinding attacks.
+2. 🌐 **Cross-Origin CSRF Protection**: Validates the `Origin` header on state-changing HTTP methods (`POST`, `PUT`, `DELETE`, `PATCH`). Requests from untrusted origins are rejected with `403 Forbidden`.
+3. 🔐 **Hardware-Backed Credential Security**: Cloud API tokens are encrypted via Windows DPAPI before storage. Keys are masked in all API responses.
+4. 🧱 **Data Isolation & IDOR Protection**: Endpoints enforce user ownership checks. Users cannot view, modify, or delete another user's conversations, uploaded documents, or session history.
+5. 🚫 **Path Traversal Guards**: Uploaded filenames are sanitized (`os.path.basename` + regex character whitelist), preventing directory escape attempts (`../../evil.pdf`).
+6. 🔒 **Defensive HTTP Headers**: Enforces `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and restrictive `Permissions-Policy`.
 
 ---
 
-## 18. Common Troubleshooting
+## 🔧 19. Common Troubleshooting
 
 | Symptom | Probable Cause | Recommended Resolution |
 | :--- | :--- | :--- |
@@ -481,15 +560,15 @@ flowchart LR
 
 ---
 
-## 19. Known Limitations
+## ⚠️ 20. Known Limitations
 
-- **OCR Processing**: Scanned image PDFs without a digital text layer are not automatically transcribed; digital text extraction via `pypdf` is currently required.
-- **Hardware-Dependent Inference**: Deliberation speed on local hardware depends on available CPU/VRAM. Models $\ge 8\text{B}$ parameters require 8GB+ VRAM for optimal token generation.
-- **Desktop Single-Tenant Default**: In default local desktop mode, the application operates as a single-user system. Multi-user session isolation activates when user accounts are registered and authenticated via JWT.
+- 📄 **OCR Processing**: Scanned image PDFs without a digital text layer are not automatically transcribed; digital text extraction via `pypdf` is currently required.
+- ⚡ **Hardware-Dependent Inference**: Deliberation speed on local hardware depends on available CPU/VRAM. Models $\ge 8\text{B}$ parameters require 8GB+ VRAM for optimal token generation.
+- 👤 **Desktop Single-Tenant Default**: In default local desktop mode, the application operates as a single-user system. Multi-user session isolation activates when user accounts are registered and authenticated via JWT.
 
 ---
 
-## 20. Contributing
+## 🤝 21. Contributing
 
 Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming conventions, pull request guidelines, and code style standards.
 
@@ -506,16 +585,16 @@ npm --prefix frontend run build
 
 ---
 
-## 21. License
+## 📄 22. License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 22. Author
+## 👤 23. Author
 
 **Kishanth M.**
-- **GitHub**: [https://github.com/kishanth-m](https://github.com/kishanth-m)
-- **LinkedIn**: [https://linkedin.com/in/kishanth-m-aa055b2a3/](https://linkedin.com/in/kishanth-m-aa055b2a3/)
+- 🐙 **GitHub**: [https://github.com/kishanth-m](https://github.com/kishanth-m)
+- 💼 **LinkedIn**: [https://linkedin.com/in/kishanth-m-aa055b2a3/](https://linkedin.com/in/kishanth-m-aa055b2a3/)
 
 *AI Engineering student specializing in multi-agent orchestration, LLMs, hybrid RAG, and local-first privacy architecture.*
