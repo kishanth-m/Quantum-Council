@@ -15,7 +15,7 @@ sequenceDiagram
     participant Orch as Orchestrator (LangGraph)
     participant R as Researcher
     participant A as Analyst
-    participant Alt as Alternative Thinker
+    participant Thinker as Alternative Thinker
     participant C as Critic
     participant S as Specialist
     participant Rebuttal as Challenged Agent
@@ -23,13 +23,13 @@ sequenceDiagram
     User->>Orch: Submit Prompt / Deliberation Goal
     Note over Orch: Inspects Prompt & Ingests Vault RAG Context
     
-    Note over Orch,Alt: Phase 1 — Primary Evidence & Analysis
+    Note over Orch,Thinker: Phase 1 — Primary Evidence & Analysis
     Orch->>R: Gather empirical baselines & citations
     R-->>Orch: Empirical Baseline (60-120 words)
     Orch->>A: Evaluate feasibility & computational trade-offs
     A-->>Orch: Feasibility Analysis (60-120 words)
-    Orch->>Alt: Propose unorthodox & lateral approaches
-    Alt-->>Orch: Lateral Proposal (60-120 words)
+    Orch->>Thinker: Propose unorthodox & lateral approaches
+    Thinker-->>Orch: Lateral Proposal (60-120 words)
 
     Note over Orch,C: Phase 2 — Technical Specification & Review
     Orch->>S: Deliver code spec & mathematical validation
