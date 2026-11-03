@@ -80,3 +80,4 @@ Users have complete ownership of their local data via **Settings $\rightarrow$ D
 - **Storage Metrics**: Real, measured disk usage across chats, deliberation logs, uploaded documents, and vector caches.
 - **Atomic Cleanup**: Transactional deletion of conversation history, agent logs, or indexed documents.
 - **Master Reset**: Safe `DELETE ALL DATA` operation that purges databases and caches while preserving user preferences and encrypted credentials.
+

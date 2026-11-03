@@ -103,40 +103,36 @@ Quantum Council coordinates five specialised minds governed by a central LangGra
 sequenceDiagram
     autonumber
     actor User
-    participant Orch as "Orchestrator (LangGraph)"
-    participant R as "Researcher"
-    participant A as "Analyst"
-    participant Alt as "Alternative Thinker"
-    participant C as "Critic"
-    participant S as "Specialist"
-    participant Rebuttal as "Challenged Agent"
+    participant Orch as Orchestrator (LangGraph)
+    participant R as Researcher
+    participant A as Analyst
+    participant Alt as Alternative Thinker
+    participant C as Critic
+    participant S as Specialist
+    participant Rebuttal as Challenged Agent
 
     User->>Orch: Submit Prompt / Task Goal
     Note over Orch: Ingests Query & Retrieves Knowledge Vault RAG Passages
     
-    par Phase 1: Evidence & Analysis
-        Orch->>R: Request empirical baseline & citations
-        Orch->>A: Request feasibility & algorithmic trade-offs
-        Orch->>Alt: Request lateral & alternative approaches
-    end
+    Note over Orch,Alt: Phase 1 — Evidence & Analysis
+    Orch->>R: Request empirical baseline & citations
+    R-->>Orch: Empirical Baseline (60-120 words)
+    Orch->>A: Request feasibility & algorithmic trade-offs
+    A-->>Orch: Feasibility Analysis (60-120 words)
+    Orch->>Alt: Request lateral & alternative approaches
+    Alt-->>Orch: Lateral Proposal (60-120 words)
 
-    R-->>Orch: Empirical Baseline (~60-120 words)
-    A-->>Orch: Feasibility Analysis (~60-120 words)
-    Alt-->>Orch: Lateral Proposal (~60-120 words)
-
-    par Phase 2: Technical Specification & Review
-        Orch->>S: Request implementation specification & validation
-        Orch->>C: Request cross-examination & peer review
-    end
-
-    S-->>Orch: Technical Implementation (~60-120 words)
+    Note over Orch,C: Phase 2 — Technical Specification & Review
+    Orch->>S: Request implementation specification & validation
+    S-->>Orch: Technical Implementation (60-120 words)
+    Orch->>C: Request cross-examination & peer review
     C-->>Orch: Dialectical Critique & Specific Agent Challenge
 
-    Note over Orch,Rebuttal: Phase 3: Dialectical Debate & Cross-Examination
-    Orch->>Rebuttal: Critic challenges assumptions; execute Round 2 rebuttal
+    Note over Orch,Rebuttal: Phase 3 — Dialectical Debate & Cross-Examination
+    Orch->>Rebuttal: Critic challenges assumptions (Execute Round 2 rebuttal)
     Rebuttal-->>Orch: Revised Position & Counter-Arguments
 
-    Note over Orch: Phase 4: Consensus Synthesis
+    Note over Orch: Phase 4 — Consensus Synthesis
     Orch->>Orch: Synthesise Mandatory 4-Part Final Council Answer
     Orch-->>User: Stream Final Answer + Complete Session Transcript
 ```

@@ -94,3 +94,4 @@ flowchart TD
 - **Pure-Python Text Extraction**: Page-by-page PDF extraction using `pypdf`.
 - **Hybrid Scoring**: Combines cosine vector similarity with exact keyword coverage and bigram phrase boosts.
 - **Verifiable Citations**: Every retrieved chunk retains page numbers and document filenames, strictly cited in final answers.
+
