@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantum Council — Five Minds. One Intelligence.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        try {
+          var themes = {
+            'quantum-cinematic': { p: ['#080D14', '#0B1724', '#102B3A', '#16C7C2', '#45D9F5', '#8175FF'], g: '#16C7C2' },
+            'forest-green': { p: ['#0B0F0D', '#1F2A1F', '#3E5A3F', '#8CA98C', '#D9C7A3', '#B08D57'], g: '#8CA98C' },
+            'midnight-blue': { p: ['#0B132B', '#1C2541', '#3A506B', '#5BC0BE', '#F4D6B0', '#D97706'], g: '#5BC0BE' },
+            'deep-olive': { p: ['#0F1F17', '#1E3A2E', '#3E5A3F', '#6B7F67', '#C7CBB8', '#3D4337'], g: '#6B7F67' },
+            'warm-earth': { p: ['#1A120E', '#3A2418', '#6B4A2E', '#A88462', '#D5C4AE', '#4A4A46'], g: '#A88462' },
+            'cosmic-purple': { p: ['#0E0B1D', '#2A1E4D', '#5A3B8C', '#8B7CC7', '#C9C2E3', '#3A3A52'], g: '#8B7CC7' },
+            'neon-rose': { p: ['#1A0F2E', '#3B1B4F', '#7A2E6F', '#D6598F', '#F4D7D4', '#FF6B6B'], g: '#D6598F' },
+            'violet-amber': { p: ['#1A1A1F', '#2D2B55', '#6A5ACD', '#A678B9', '#F0D9B5', '#F4A62A'], g: '#6A5ACD' },
+            'slate-pink': { p: ['#121212', '#1F2937', '#334155', '#64748B', '#F1F5F9', '#EC4899'], g: '#EC4899' },
+            'teal-ember': { p: ['#0A0F14', '#0F3D3E', '#2E6F73', '#7FB3B8', '#EADCC8', '#C6601F'], g: '#7FB3B8' }
+          };
+          var id = localStorage.getItem('quantum-council-theme') || 'quantum-cinematic';
+          var t = themes[id] || themes['quantum-cinematic'];
+          function h2rgb(h) {
+            var n = parseInt(h.replace('#',''), 16);
+            return ((n>>16)&255) + ', ' + ((n>>8)&255) + ', ' + (n&255);
+          }
+          var root = document.documentElement;
+          root.style.setProperty('--bg-primary', t.p[0]);
+          root.style.setProperty('--bg-surface', t.p[1]);
+          root.style.setProperty('--bg-surface-elevated', t.p[2]);
+          root.style.setProperty('--accent-primary', t.p[3]);
+          root.style.setProperty('--accent-secondary', t.p[4]);
+          root.style.setProperty('--accent-highlight', t.p[5]);
+          root.style.setProperty('--theme-glow', t.g);
+
+          root.style.setProperty('--bg-primary-rgb', h2rgb(t.p[0]));
+          root.style.setProperty('--bg-surface-rgb', h2rgb(t.p[1]));
+          root.style.setProperty('--bg-surface-elevated-rgb', h2rgb(t.p[2]));
+          root.style.setProperty('--accent-primary-rgb', h2rgb(t.p[3]));
+          root.style.setProperty('--accent-secondary-rgb', h2rgb(t.p[4]));
+          root.style.setProperty('--accent-highlight-rgb', h2rgb(t.p[5]));
+          root.style.setProperty('--theme-glow-rgb', h2rgb(t.g));
+        } catch(e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-obsidian text-offWhite antialiased selection:bg-neonGreen selection:text-obsidian min-h-screen overflow-x-hidden">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

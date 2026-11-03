@@ -1,0 +1,99 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+pip-wheel-metadata/
+
+# ─── Virtual Environments ─────────────────────────────────────────────────────
+.venv/
+venv/
+ENV/
+env/
+
+# ─── Environment & Secrets ────────────────────────────────────────────────────
+# NEVER commit .env files. They contain API keys, DB passwords, and local secrets.
+.env
+.env.local
+.env.production
+.env.*.local
+*.env
+!*.env.example
+
+# ─── Database & User Data (Local-First Private Storage) ────────────────────────
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+test.db
+backend/data/
+data/
+
+# ─── ChromaDB Vector Store & Embeddings ───────────────────────────────────────
+backend/chroma_db/
+chroma_db/
+
+# ─── Uploaded Documents (Private User Files) ──────────────────────────────────
+backend/uploads/
+uploads/
+
+# ─── Keys & Credentials ───────────────────────────────────────────────────────
+keys/
+backend/keys/
+*.key
+
+# ─── Logs & Debug Dumps ───────────────────────────────────────────────────────
+*.log
+logs/
+backend/logs/
+
+# ─── Internal Development Backups ─────────────────────────────────────────────
+_backup_*/
+*.bak
+*.backup
+
+# ─── Node & Frontend ──────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+node_modules/
+.cache/
+*.tsbuildinfo
+frontend/build/
+
+# ─── OS Files ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDE & Editors ────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.user
+
+# ─── Testing & Coverage ───────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+.vitest/
+
+# ─── Security Scan Outputs & Evaluations ──────────────────────────────────────
+bandit-report.json
+semgrep-report.json
+evaluation/results/*.json
+evaluation/results/*.csv
+
+# ─── Temporary Files ──────────────────────────────────────────────────────────
+tmp/
+temp/
+*.tmp

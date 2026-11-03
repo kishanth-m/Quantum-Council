@@ -1,0 +1,346 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  /* Cinematic Intelligence Foundation RGB channels */
+  --bg-primary-rgb: 8, 13, 20;
+  --bg-surface-rgb: 11, 23, 36;
+  --bg-surface-elevated-rgb: 16, 43, 58;
+  --accent-primary-rgb: 22, 199, 194;
+  --accent-secondary-rgb: 69, 217, 245;
+  --accent-highlight-rgb: 129, 117, 255;
+  --theme-glow-rgb: 22, 199, 194;
+
+  --bg-primary: #080D14;
+  --bg-surface: #0B1724;
+  --bg-surface-elevated: #102B3A;
+  --accent-primary: #16C7C2;
+  --accent-secondary: #45D9F5;
+  --accent-highlight: #8175FF;
+  --theme-glow: #16C7C2;
+
+  /* Liquid Glass Optical Tokens */
+  --liquid-glass-blur-std: 22px;
+  --liquid-glass-blur-elevated: 28px;
+  --liquid-glass-specular-std: rgba(255, 255, 255, 0.18);
+  --liquid-glass-specular-high: rgba(255, 255, 255, 0.28);
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: #F8F8F8;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for cinematic liquid glass aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--bg-surface-elevated-rgb), 0.7);
+  border-radius: 4px;
+  border: 1px solid rgba(var(--accent-secondary-rgb), 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-secondary);
+}
+
+/* =========================================================================
+   GPU-ACCELERATED AMBIENT MOTION KEYFRAMES
+   Ensures continuous, organic, visible movement on the browser compositor
+   ========================================================================= */
+
+@keyframes ambient-orb-1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  33% {
+    transform: translate3d(90px, 60px, 0) scale(1.18);
+    opacity: 0.75;
+  }
+  66% {
+    transform: translate3d(-50px, 110px, 0) scale(0.92);
+    opacity: 0.60;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+}
+
+@keyframes ambient-orb-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.50;
+  }
+  40% {
+    transform: translate3d(-80px, -70px, 0) scale(1.22);
+    opacity: 0.70;
+  }
+  75% {
+    transform: translate3d(70px, -40px, 0) scale(0.88);
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.50;
+  }
+}
+
+@keyframes ambient-orb-3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.40;
+  }
+  50% {
+    transform: translate3d(60px, -90px, 0) scale(1.15);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.40;
+  }
+}
+
+@keyframes ambient-orb-4 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.95);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(-70px, 50px, 0) scale(1.20);
+    opacity: 0.68;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.95);
+    opacity: 0.45;
+  }
+}
+
+.animate-ambient-orb-1 {
+  animation: ambient-orb-1 16s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-ambient-orb-2 {
+  animation: ambient-orb-2 20s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-ambient-orb-3 {
+  animation: ambient-orb-3 24s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-ambient-orb-4 {
+  animation: ambient-orb-4 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* =========================================================================
+   REALISTIC LIQUID GLASS MATERIAL SYSTEM
+   Optical transparency, diagonal light sheens, specular top highlights,
+   dual-edge refraction, and layered atmospheric depth matching Reference UI.
+   ========================================================================= */
+
+/* 1. Main Liquid Window Shell (Matching Reference 1 & 2 Pod Window) */
+.liquid-window {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(var(--bg-surface-rgb), 0.65) 20%,
+    rgba(var(--bg-primary-rgb), 0.85) 100%
+  );
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 
+    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.24),
+    inset 0 0 24px 0 rgba(var(--accent-secondary-rgb), 0.06),
+    0 30px 80px -20px rgba(0, 0, 0, 0.9),
+    0 0 35px rgba(var(--theme-glow-rgb), 0.10);
+  border-radius: 28px;
+}
+
+/* 2. Primary Liquid Glass: Main workspace panels, conversation timelines, canvas shells */
+.liquid-glass-primary,
+.glass-primary,
+.glass-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(var(--bg-surface-rgb), 0.52) 25%,
+    rgba(var(--bg-surface-rgb), 0.72) 100%
+  );
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 18px 0 rgba(var(--accent-primary-rgb), 0.05),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.4),
+    0 20px 48px -12px rgba(0, 0, 0, 0.75);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 3. Secondary Liquid Glass: Informational cards, metric widgets, auxiliary containers */
+.liquid-glass-secondary,
+.glass-secondary,
+.liquid-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(var(--bg-surface-elevated-rgb), 0.38) 30%,
+    rgba(var(--bg-surface-rgb), 0.55) 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.3),
+    0 12px 32px -6px rgba(0, 0, 0, 0.55);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 4. Floating Liquid Glass: Dropdowns, tooltips, slide-out telemetry drawer, popovers */
+.liquid-glass-floating,
+.glass-floating {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(var(--bg-primary-rgb), 0.88) 30%,
+    rgba(var(--bg-primary-rgb), 0.96) 100%
+  );
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(var(--accent-secondary-rgb), 0.32);
+  box-shadow: 
+    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.5),
+    0 24px 64px -14px rgba(0, 0, 0, 0.88),
+    0 0 25px rgba(var(--theme-glow-rgb), 0.14);
+}
+
+/* 5. Elevated Liquid Glass: Modals, final consensus cards, highlighted outcomes */
+.liquid-glass-elevated,
+.glass-elevated,
+.glass-panel-glow {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(var(--bg-surface-elevated-rgb), 0.72) 22%,
+    rgba(var(--bg-surface-rgb), 0.88) 100%
+  );
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+  border: 1px solid rgba(var(--accent-secondary-rgb), 0.40);
+  box-shadow: 
+    inset 0 2px 0 0 rgba(255, 255, 255, 0.30),
+    inset 0 0 25px 0 rgba(var(--accent-primary-rgb), 0.10),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.5),
+    0 28px 64px -16px rgba(0, 0, 0, 0.85),
+    0 0 35px rgba(var(--theme-glow-rgb), 0.20);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 6. Interactive Liquid Glass: Clickable cards, navigation rows, buttons */
+.liquid-glass-interactive,
+.glass-interactive {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(var(--bg-surface-rgb), 0.45) 30%,
+    rgba(var(--bg-surface-rgb), 0.65) 100%
+  );
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
+    0 8px 24px -4px rgba(0, 0, 0, 0.45);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-interactive:hover,
+.glass-interactive:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(var(--bg-surface-elevated-rgb), 0.62) 30%,
+    rgba(var(--bg-surface-rgb), 0.78) 100%
+  );
+  border-color: rgba(var(--accent-secondary-rgb), 0.45);
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 18px 0 rgba(var(--accent-primary-rgb), 0.14),
+    0 16px 40px -8px rgba(0, 0, 0, 0.70),
+    0 0 28px rgba(var(--theme-glow-rgb), 0.25);
+}
+
+.liquid-glass-interactive:active,
+.glass-interactive:active {
+  transform: translateY(0px) scale(0.99);
+}
+
+/* 7. Subtle Liquid Glass: Badge pills, small indicators */
+.liquid-glass-subtle {
+  background: rgba(var(--bg-surface-rgb), 0.40);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+}
+
+/* 8. Modern Pill Badge Tokens (Matching Reference 1 & 2 Top Controls) */
+.liquid-pill {
+  border-radius: 9999px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.liquid-pill-active {
+  background: #FFFFFF;
+  color: #080D14;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.liquid-pill-inactive {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.liquid-pill-inactive:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+}
+
+.glow-neon {
+  box-shadow: 0 0 18px var(--accent-primary);
+}
+
+.glow-theme {
+  box-shadow: 0 0 25px var(--theme-glow);
+}
+
