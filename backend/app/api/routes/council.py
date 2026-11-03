@@ -21,7 +21,8 @@ from app.config import settings
 from app.core.provider_factory import get_provider_for_agent as central_get_provider
 from app.core.resilience import RecoveryPolicy
 from app.database.db import get_db
-from app.database.models import CouncilSession, AgentMessage, ExecutionEvent
+from app.database.models import CouncilSession, AgentMessage, ExecutionEvent, User
+from app.security.authorization import get_current_user_optional
 from app.core.schemas import (
     CouncilSessionDetailResponse,
     ResilienceConfigSchema,
@@ -90,11 +91,16 @@ async def update_resilience_config(update: ResilienceConfigUpdateSchema):
 
 
 @router.post("/session", response_model=CouncilSessionDetailResponse)
-async def start_council_session(req: StartSessionRequest, db: Session = Depends(get_db)):
+async def start_council_session(
+    req: StartSessionRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
     """
     Starts a new Council session using the fault-tolerant LangGraph workflow.
     Publishes live events to in-memory queues and persists to database upon completion.
     """
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
     import time
     start_perf = time.perf_counter()
     session_id = str(uuid.uuid4())
@@ -175,7 +181,7 @@ async def start_council_session(req: StartSessionRequest, db: Session = Depends(
         try:
             db_session = CouncilSession(
                 id=session_id,
-                user_id="default_user",
+                user_id=user_id,
                 title=req.task[:64] + ("..." if len(req.task) > 64 else ""),
                 task=req.task,
                 mode=req.mode,
@@ -224,11 +230,16 @@ async def start_council_session(req: StartSessionRequest, db: Session = Depends(
 
 
 @router.post("/session/stream")
-async def stream_council_execution(req: StartSessionRequest, db: Session = Depends(get_db)):
+async def stream_council_execution(
+    req: StartSessionRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
     """
     Direct SSE streaming endpoint: executes the Council workflow and streams events
     in real time as agents think, speak, debate, critique, and synthesize.
     """
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
     import time
     session_id = str(uuid.uuid4())
     queue: asyncio.Queue = asyncio.Queue()
@@ -307,7 +318,7 @@ async def stream_council_execution(req: StartSessionRequest, db: Session = Depen
         try:
             council_session = CouncilSession(
                 id=session_id,
-                user_id="default_user",
+                user_id=user_id,
                 title=req.task[:64] + ("..." if len(req.task) > 64 else ""),
                 task=req.task,
                 mode=req.mode,

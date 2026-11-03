@@ -23,7 +23,8 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.core.paths import get_uploads_dir
 from app.database.db import SessionLocal, get_db
-from app.database.models import Document, DocumentChunk, DocumentCollection
+from app.database.models import Document, DocumentChunk, DocumentCollection, User
+from app.security.authorization import get_current_user_optional
 
 router = APIRouter(prefix="/documents", tags=["Documents & RAG"])
 
@@ -257,9 +258,18 @@ class TestRetrievalRequest(BaseModel):
 # ─── Endpoints ─────────────────────────────────────────────────────────────────
 
 @router.get("", response_model=List[DocumentResponse])
-def list_documents(db: Session = Depends(get_db)):
-    """List indexed documents with verified page counts and status."""
-    docs = db.query(Document).order_by(Document.uploaded_at.desc()).all()
+def list_documents(
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    """List indexed documents scoped to the authenticated user or local desktop user."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
+    docs = (
+        db.query(Document)
+        .filter(Document.user_id == user_id)
+        .order_by(Document.uploaded_at.desc())
+        .all()
+    )
     return [
         DocumentResponse(
             id=d.id,
@@ -279,12 +289,14 @@ def list_documents(db: Session = Depends(get_db)):
 async def upload_document(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     """
     Upload and index a document (PDF or text).
     Extracts text page-by-page, generates cohesive chunks, stores TF-IDF vectors in SQLite,
     and updates live in-memory cache with verifiable page references.
     """
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
     raw_filename = file.filename or "document.pdf"
     ext = os.path.splitext(raw_filename)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
@@ -420,7 +432,7 @@ async def upload_document(
     # Persist Document record and chunks into database
     doc_record = Document(
         id=doc_id,
-        user_id="default_user",
+        user_id=user_id,
         filename=sanitized_filename,
         original_filename=raw_filename,
         file_size_bytes=len(content_bytes),
@@ -488,8 +500,17 @@ def test_retrieval(req: TestRetrievalRequest, db: Session = Depends(get_db)):
 
 
 @router.get("/{document_id}/chunks")
-def get_document_chunks(document_id: str, db: Session = Depends(get_db)):
-    """Inspect all extracted chunks and page references for a document."""
+def get_document_chunks(
+    document_id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    """Inspect all extracted chunks and page references for a document with ownership check."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
+    doc = db.query(Document).filter(Document.id == document_id, Document.user_id == user_id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
     chunks = (
         db.query(DocumentChunk)
         .filter(DocumentChunk.document_id == document_id)
@@ -508,9 +529,14 @@ def get_document_chunks(document_id: str, db: Session = Depends(get_db)):
 
 
 @router.delete("/{document_id}")
-def delete_document(document_id: str, db: Session = Depends(get_db)):
-    """Delete an individual document and all associated persistent vector chunks."""
-    doc = db.query(Document).filter(Document.id == document_id).first()
+def delete_document(
+    document_id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    """Delete an individual document and its chunks with ownership IDOR verification."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
+    doc = db.query(Document).filter(Document.id == document_id, Document.user_id == user_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 

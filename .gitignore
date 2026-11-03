@@ -97,3 +97,10 @@ evaluation/results/*.csv
 tmp/
 temp/
 *.tmp
+
+# ─── Internal Development Notes, Reports & Diagnostics ────────────────────────
+*REPORT*.md
+*HANDOVER*.md
+*BUG_REGISTER*.md
+evaluation/
+

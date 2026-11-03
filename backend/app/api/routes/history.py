@@ -6,12 +6,13 @@ Session history endpoints.
 
 from typing import List, Optional
 from datetime import datetime
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database.db import get_db
-from app.database.models import CouncilSession
+from app.database.models import CouncilSession, User
+from app.security.authorization import get_current_user_optional
 
 router = APIRouter(prefix="/history", tags=["History"])
 
@@ -51,10 +52,16 @@ class SessionDetail(BaseModel):
 
 
 @router.get("/sessions", response_model=List[SessionSummary])
-def get_session_history(limit: int = 20, db: Session = Depends(get_db)):
-    """Retrieve historical council sessions."""
+def get_session_history(
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    """Retrieve historical council sessions scoped to user or desktop installation."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
     sessions = (
         db.query(CouncilSession)
+        .filter(CouncilSession.user_id == user_id)
         .order_by(CouncilSession.created_at.desc())
         .limit(limit)
         .all()
@@ -75,11 +82,18 @@ def get_session_history(limit: int = 20, db: Session = Depends(get_db)):
 
 
 @router.get("/sessions/{session_id}", response_model=SessionDetail)
-def get_session_detail(session_id: str, db: Session = Depends(get_db)):
-    """Retrieve detailed information for a specific council session."""
-    session = db.query(CouncilSession).filter(CouncilSession.id == session_id).first()
+def get_session_detail(
+    session_id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    """Retrieve detailed information for a specific council session with IDOR protection."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
+    session = db.query(CouncilSession).filter(
+        CouncilSession.id == session_id,
+        CouncilSession.user_id == user_id,
+    ).first()
     if not session:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Session not found")
     
     msgs = [

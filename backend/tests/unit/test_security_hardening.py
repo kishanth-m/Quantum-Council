@@ -244,3 +244,144 @@ def test_no_hardcoded_api_keys_in_tracked_code():
                         pass
 
     assert len(found_secrets) == 0, f"Found hardcoded secrets in source files: {found_secrets}"
+
+
+# ─── 12. Cross-User Data Isolation & IDOR Protection ──────────────────────────
+
+def test_cross_user_conversation_isolation_and_idor():
+    """Verify that User B cannot view, list, or delete conversations created by User A."""
+    from app.database.db import SessionLocal
+    from app.database.models import User
+    from app.security.authentication import create_access_token, hash_password
+    import uuid
+
+    db = SessionLocal()
+    user_a_id = str(uuid.uuid4())
+    user_b_id = str(uuid.uuid4())
+
+    user_a = User(
+        id=user_a_id,
+        username=f"usera_{user_a_id[:6]}",
+        email=f"usera_{user_a_id[:6]}@example.com",
+        hashed_password=hash_password("password123"),
+        is_active=True,
+    )
+    user_b = User(
+        id=user_b_id,
+        username=f"userb_{user_b_id[:6]}",
+        email=f"userb_{user_b_id[:6]}@example.com",
+        hashed_password=hash_password("password123"),
+        is_active=True,
+    )
+    db.add(user_a)
+    db.add(user_b)
+    db.commit()
+
+    token_a = create_access_token(user_a_id)
+    token_b = create_access_token(user_b_id)
+    headers_a = {"Authorization": f"Bearer {token_a}"}
+    headers_b = {"Authorization": f"Bearer {token_b}"}
+
+    # 1. User A creates conversation
+    create_res = client.post(
+        "/api/v1/chat/conversations",
+        json={"agent_id": "researcher", "title": "User A Private Research"},
+        headers=headers_a,
+    )
+    assert create_res.status_code == 200
+    conv_id = create_res.json()["id"]
+
+    # 2. User B tries to read User A's conversation directly (IDOR check)
+    get_res = client.get(f"/api/v1/chat/conversations/{conv_id}", headers=headers_b)
+    assert get_res.status_code == 404
+
+    # 3. User B lists conversations -> User A's conversation must not appear
+    list_res = client.get("/api/v1/chat/conversations", headers=headers_b)
+    assert list_res.status_code == 200
+    assert all(c["id"] != conv_id for c in list_res.json())
+
+    # 4. User B tries to delete User A's conversation -> blocked with 404
+    del_res = client.delete(f"/api/v1/chat/conversations/{conv_id}", headers=headers_b)
+    assert del_res.status_code == 404
+
+    # 5. User A can still access and delete their own conversation
+    own_res = client.get(f"/api/v1/chat/conversations/{conv_id}", headers=headers_a)
+    assert own_res.status_code == 200
+    del_own_res = client.delete(f"/api/v1/chat/conversations/{conv_id}", headers=headers_a)
+    assert del_own_res.status_code == 200
+
+
+def test_cross_user_document_and_history_isolation():
+    """Verify that User B cannot access documents or history sessions owned by User A."""
+    from app.database.db import SessionLocal
+    from app.database.models import User, Document, CouncilSession
+    from app.security.authentication import create_access_token, hash_password
+    import uuid
+
+    db = SessionLocal()
+    user_a_id = str(uuid.uuid4())
+    user_b_id = str(uuid.uuid4())
+
+    user_a = User(
+        id=user_a_id,
+        username=f"usera2_{user_a_id[:6]}",
+        email=f"usera2_{user_a_id[:6]}@example.com",
+        hashed_password=hash_password("password123"),
+        is_active=True,
+    )
+    user_b = User(
+        id=user_b_id,
+        username=f"userb2_{user_b_id[:6]}",
+        email=f"userb2_{user_b_id[:6]}@example.com",
+        hashed_password=hash_password("password123"),
+        is_active=True,
+    )
+    db.add(user_a)
+    db.add(user_b)
+
+    doc_id = str(uuid.uuid4())
+    doc = Document(
+        id=doc_id,
+        user_id=user_a_id,
+        filename="confidential_user_a.pdf",
+        original_filename="confidential.pdf",
+        file_size_bytes=1024,
+        page_count=2,
+        chunk_count=2,
+        status="indexed",
+    )
+    db.add(doc)
+
+    session_id = str(uuid.uuid4())
+    session = CouncilSession(
+        id=session_id,
+        user_id=user_a_id,
+        title="User A Secret Strategy",
+        task="Top Secret Deliberation",
+        mode="council",
+        status="completed",
+        final_answer="Classified Answer",
+    )
+    db.add(session)
+    db.commit()
+
+    token_b = create_access_token(user_b_id)
+    headers_b = {"Authorization": f"Bearer {token_b}"}
+
+    # User B cannot access User A's document chunks
+    chunks_res = client.get(f"/api/v1/documents/{doc_id}/chunks", headers=headers_b)
+    assert chunks_res.status_code == 404
+
+    # User B cannot delete User A's document
+    del_doc_res = client.delete(f"/api/v1/documents/{doc_id}", headers=headers_b)
+    assert del_doc_res.status_code == 404
+
+    # User B cannot access User A's session detail
+    session_res = client.get(f"/api/v1/history/sessions/{session_id}", headers=headers_b)
+    assert session_res.status_code == 404
+
+    # User B's history listing does not include User A's session
+    hist_res = client.get("/api/v1/history/sessions", headers=headers_b)
+    assert hist_res.status_code == 200
+    assert all(s["id"] != session_id for s in hist_res.json())
+

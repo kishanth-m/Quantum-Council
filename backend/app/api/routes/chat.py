@@ -16,7 +16,8 @@ from app.api.routes.documents import retrieve_relevant_chunks
 from app.core.provider_factory import get_provider_for_agent
 from app.core.response_validator import execute_with_controlled_continuation
 from app.database.db import get_db
-from app.database.models import AgentConfig, Conversation, ConversationMessage
+from app.database.models import AgentConfig, Conversation, ConversationMessage, User
+from app.security.authorization import get_current_user_optional
 
 router = APIRouter(prefix="/chat", tags=["Agent Chat"])
 
@@ -69,9 +70,11 @@ class SendMessageRequest(BaseModel):
 def list_conversations(
     agent_id: Optional[str] = None,
     db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    """List conversations, optionally filtered by agent_id for strict isolation."""
-    query = db.query(Conversation)
+    """List conversations scoped to authenticated user or default desktop user."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
+    query = db.query(Conversation).filter(Conversation.user_id == user_id)
     if agent_id:
         query = query.filter(Conversation.agent_id == agent_id.lower())
     
@@ -93,14 +96,16 @@ def list_conversations(
 def create_conversation(
     req: CreateConversationRequest,
     db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    """Create a new isolated conversation thread for an agent."""
+    """Create a new isolated conversation thread scoped to authenticated user."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
     aid = req.agent_id.lower()
     title = req.title or f"Discussion with {aid.title()}"
 
     conv = Conversation(
         agent_id=aid,
-        user_id="default_user",
+        user_id=user_id,
         title=title,
         created_at=datetime.now(timezone.utc),
         updated_at=datetime.now(timezone.utc),
@@ -123,9 +128,14 @@ def create_conversation(
 def get_conversation_detail(
     conversation_id: str,
     db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    """Retrieve an agent's conversation thread with its full message history."""
-    conv = db.query(Conversation).filter(Conversation.id == conversation_id).first()
+    """Retrieve an agent's conversation thread with ownership IDOR protection."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
+    conv = db.query(Conversation).filter(
+        Conversation.id == conversation_id,
+        Conversation.user_id == user_id,
+    ).first()
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
@@ -155,9 +165,14 @@ def rename_conversation(
     conversation_id: str,
     req: RenameConversationRequest,
     db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    """Rename a conversation thread."""
-    conv = db.query(Conversation).filter(Conversation.id == conversation_id).first()
+    """Rename a conversation thread with ownership IDOR verification."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
+    conv = db.query(Conversation).filter(
+        Conversation.id == conversation_id,
+        Conversation.user_id == user_id,
+    ).first()
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
@@ -180,9 +195,14 @@ def rename_conversation(
 def delete_conversation(
     conversation_id: str,
     db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    """Delete a conversation thread and its associated message history."""
-    conv = db.query(Conversation).filter(Conversation.id == conversation_id).first()
+    """Delete a conversation thread with ownership IDOR protection."""
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
+    conv = db.query(Conversation).filter(
+        Conversation.id == conversation_id,
+        Conversation.user_id == user_id,
+    ).first()
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
@@ -196,12 +216,17 @@ async def send_agent_message(
     conversation_id: str,
     req: SendMessageRequest,
     db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     """
     Send a message to an individual agent in this conversation thread.
     Maintains multi-turn conversation context and executes via the agent's configured model.
     """
-    conv = db.query(Conversation).filter(Conversation.id == conversation_id).first()
+    user_id = current_user.id if hasattr(current_user, "id") else "default_user"
+    conv = db.query(Conversation).filter(
+        Conversation.id == conversation_id,
+        Conversation.user_id == user_id,
+    ).first()
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
